@@ -1,10 +1,27 @@
-import {highlightActiveLineGutter, highlightSpecialChars, drawSelection, dropCursor, highlightActiveLine, keymap} from '@codemirror/view';
+import {
+    drawSelection,
+    dropCursor,
+    highlightActiveLine,
+    highlightActiveLineGutter,
+    highlightSpecialChars,
+    keymap,
+} from '@codemirror/view';
 import {EditorView} from '@codemirror/view';
 import {EditorState} from '@codemirror/state';
-import {indentOnInput, syntaxHighlighting, defaultHighlightStyle, bracketMatching, foldKeymap} from '@codemirror/language';
+import {
+    bracketMatching,
+    defaultHighlightStyle,
+    indentOnInput,
+    syntaxHighlighting,
+} from '@codemirror/language';
 import {defaultKeymap, history, historyKeymap} from '@codemirror/commands';
 import {highlightSelectionMatches, searchKeymap} from '@codemirror/search';
-import {closeBrackets, autocompletion, closeBracketsKeymap, completionKeymap} from '@codemirror/autocomplete';
+import {
+    autocompletion,
+    closeBrackets,
+    closeBracketsKeymap,
+    completionKeymap,
+} from '@codemirror/autocomplete';
 import {lintKeymap} from '@codemirror/lint';
 
 const mySetup = /*@__PURE__*/(() => [
@@ -26,7 +43,6 @@ const mySetup = /*@__PURE__*/(() => [
         ...defaultKeymap,
         ...searchKeymap,
         ...historyKeymap,
-        ...foldKeymap,
         ...completionKeymap,
         ...lintKeymap
     ])

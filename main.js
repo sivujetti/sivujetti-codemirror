@@ -1,12 +1,16 @@
-import {EditorView, mySetup} from './my-codemirror-index';
 import {sass} from '@codemirror/lang-sass';
+import {
+    excludeFirstAndLastLineFromSelection,
+    preventFirstLastLineDeletion,
+} from './funcs';
+import {EditorView, mySetup} from './my-codemirror-index';
 
 /**
  * Example usage
  * ```javascript
- * const createSettings = (defaultSettings, {EditorView}) => ({
- *     ...defaultSettings,
- *     ...{
+ * const createBundle = (createEditorView, {defaultSettings, EditorView}) => ({
+ *     view: createEditorView({
+ *         ...defaultSettings,
  *         doc: '.foo {\n  bar: "1";\n},
  *         extensions: [
  *             ...defaultSettings.extensions,
@@ -14,32 +18,39 @@ import {sass} from '@codemirror/lang-sass';
  *                 if (e.docChanged)
  *                     console.log('Got new scss %s', e.state.doc.toString());
  *             })
- *         ]
- *     }
+ *         ],
+ *     }),
+ *     myStuff1: 'foo',
+ *     myStuff2: 'bar',
  * });
  * const el = document.querySelector('div.my-editor');
- * const bundle = window.myRenderCm6(el, createSettings);
+ * const bundle = window.renderCodeMirror6(el, createBundle);
  * const editorView = bundle.view;
  * ```
+ * @template T
  * @param {HTMLElement} renderTo
- * @param {(defaults: EditorViewConfig, stuff: {EditorView: typeof EditorView;}) => EditorViewConfig} createSettings = (defaultSettings, _stuff) => defaultSettings
- * @returns {{view: EditorView;}}
+ * @param {(
+ *   createEditorView: (settings: Object) => ({view: EditorView;} & T),
+ *   stuff: {defaultSettings: Object; EditorView: todo; excludeFirstAndLastLineFromSelection: Function; preventFirstLastLineDeletion: Function;}
+ * ) => ({view: EditorView} & T)} createBundle
+ * @returns {{view: EditorView;} & T}
  */
-export default (renderTo, createSettings = (defaultSettings, _stuff) => defaultSettings) => {
+export default (
+    renderTo,
+    createBundle = (createEditorView, stuff) => ({view: createEditorView(stuff.defaultSettings)}),
+) => {
     const defaultSettings = {
         extensions: [mySetup, sass()],
         parent: renderTo
     };
     const stuff = {
-        EditorView
-    };
-
-    const settings = createSettings(
         defaultSettings,
-        stuff
-    );
-
-    return {
-        view: new EditorView(settings),
+        EditorView,
+        excludeFirstAndLastLineFromSelection,
+        preventFirstLastLineDeletion,
     };
+    return createBundle(
+        settings => new EditorView(settings),
+        stuff,
+    );
 };
