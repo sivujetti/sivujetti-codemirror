@@ -29,21 +29,30 @@ function preventFirstLastLineDeletion() {
         if (!tr.docChanged)
             return tr;
 
-        // Check if the transaction modifies the first or last line
+        const entireDocChanged = getNumUnchangedRanges(tr.changes) === 0;
+        if (entireDocChanged)
+            return tr;
+
         const {doc} = tr.startState;
         const lineCount = doc.lines;
-        const firstLine = doc.line(1); // Example {'from': 0,'to': 5,'number': 1,'text': '.foo{'}
+        const firstLine = doc.line(1);
         const lastLine = lineCount > 1 ? doc.line(lineCount) : null;
 
         const modifiedFirst = tr.changes.touchesRange(firstLine.from, firstLine.to);
         const modifiedLast = lastLine && tr.changes.touchesRange(lastLine.from, lastLine.to);
-        // If the transaction modifies the firstLine or last line, reject it
-        if (modifiedFirst || modifiedLast) {
+        if (modifiedFirst || modifiedLast)
             return null;
-        }
 
         return tr;
     });
+}
+
+function getNumUnchangedRanges(changes) {
+    let numRanges = 0;
+    changes.iterGaps((/*posA, posB, length*/) => {
+        numRanges += 1;
+    });
+    return numRanges;
 }
 
 export {
